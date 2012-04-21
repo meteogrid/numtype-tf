@@ -60,7 +60,7 @@ This module requires GHC 7.0 or later.
 >   -- * Data types
 >   -- | These are exported to avoid lengthy qualified types in complier
 >   -- error messages.
->   , Z, S, N
+>   , Z(Z), S(S), N(N)
 >   -- * Type level arithmetics
 >   , Pred, Succ, Negate, Add, Sub, Div, Mul
 >   -- * Type synonyms for convenience
@@ -133,20 +133,20 @@ negative number in the sense of the previously defined type classes.
 'Z' corresponds to HList's 'HZero'.
 
 > -- | Type level zero.
-> data Z
+> data Z = Z
 
 Next we define the "successor" type, here called 'S' (corresponding
 to HList's 'HSucc').
 
 > -- | Successor type for building type level natural numbers.
-> data S n
+> newtype S n = S n
 
 Finally we define the "negation" type used to represent negative
 numbers.
 
 > -- | Negation type, used to represent negative numbers by negating
 > -- type level naturals.
-> data N n
+> newtype N n = N n
 
 The 'NumTypeI' instances restrict how 'Z', 'S', and 'N' may be combined
 to assemble 'NumType's, and the type synonym declarations demonstrate
