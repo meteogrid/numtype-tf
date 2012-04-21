@@ -201,16 +201,19 @@ define type families for addition and subtraction of NumTypes.
 
 Adding anything to Zero gives "anything".
 
-> type instance Add Z n = n
+> type instance Add Z b = b
+> type instance Add a Z = a
 
 When adding to a non-Zero number our strategy is to "transfer" type
 constructors from the first type to the second type until the first
 type is Zero.
 
-> type instance Add (S n) n' = Add n (Succ n')
-> type instance Add (N n) n' = Add (Succ (N n)) (Pred n')
+> type instance Add (S a) (S b) = Succ (Succ (Add a b))
+> type instance Add (N a) (S b) = Add (Succ (N a)) b
+> type instance Add (S a) (N b) = Add a (Succ (N b))
+> type instance Add (N a) (N b) = Negate (Add a b)
 
-Substitution is defined trivially with addition and negation.
+Subtraction is defined trivially with addition and negation.
 
 > type instance Sub a b = Add a (Negate b)
 
