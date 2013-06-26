@@ -61,7 +61,7 @@ This module requires GHC 7.0 or later.
 >   -- * Data types
 >   -- | These are exported to avoid lengthy qualified types in complier
 >   -- error messages.
->   , Z, S, N
+>   , Z(Z), S(S), N(N)
 >   -- * Type level arithmetics
 >   , Pred, Succ, Negate, Add, Sub, Div, Mul
 >   -- * Type synonyms for convenience
@@ -135,20 +135,20 @@ negative number in the sense of the previously defined type classes.
 'Z' corresponds to HList's 'HZero'.
 
 > -- | Type level zero.
-> data Z deriving Typeable
+> data Z = Z deriving Typeable
 
 Next we define the "successor" type, here called 'S' (corresponding
 to HList's 'HSucc').
 
 > -- | Successor type for building type level natural numbers.
-> data S n deriving Typeable
+> newtype S n = S n deriving Typeable
 
 Finally we define the "negation" type used to represent negative
 numbers.
 
 > -- | Negation type, used to represent negative numbers by negating
 > -- type level naturals.
-> data N n deriving Typeable
+> newtype N n = N n deriving Typeable
 
 The 'NumTypeI' instances restrict how 'Z', 'S', and 'N' may be combined
 to assemble 'NumType's, and the type synonym declarations demonstrate
@@ -203,16 +203,19 @@ define type families for addition and subtraction of NumTypes.
 
 Adding anything to Zero gives "anything".
 
-> type instance Add Z n = n
+> type instance Add Z b = b
+> type instance Add a Z = a
 
 When adding to a non-Zero number our strategy is to "transfer" type
 constructors from the first type to the second type until the first
 type is Zero.
 
-> type instance Add (S n) n' = Add n (Succ n')
-> type instance Add (N n) n' = Add (Succ (N n)) (Pred n')
+> type instance Add (S a) (S b) = Succ (Succ (Add a b))
+> type instance Add (N a) (S b) = Add (Succ (N a)) b
+> type instance Add (S a) (N b) = Add a (Succ (N b))
+> type instance Add (N a) (N b) = Negate (Add a b)
 
-Substitution is defined trivially with addition and negation.
+Subtraction is defined trivially with addition and negation.
 
 > type instance Sub a b = Add a (Negate b)
 
